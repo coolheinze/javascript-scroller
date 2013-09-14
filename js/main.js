@@ -12,6 +12,7 @@ var offsetX = minX = referenceX = deltaX = 0;
 var maxY = mainViewPortView.height() - mainViewPort.height();
 var offsetY = minY = referenceY = deltaY = 0;
 var referenceT = new Date().getTime();
+var isTouch = typeof window.ontouchstart !== 'undefined';
 
 // Variables for kinetic dynamics
 var velX = velY = 0;
@@ -45,7 +46,7 @@ if ( !window.requestAnimationFrame ) {
 	}());
 }
 
-if (typeof window.ontouchstart !== 'undefined') {
+if (isTouch) {
     mainViewPort.on('touchstart', tap);
     hBar.on('touchstart', tap);
     vBar.on('touchstart', tap);
@@ -93,7 +94,7 @@ function tap(e) {
 
 function drag(e) {
 	if (status == PRESSED) {
-		if(e.which == 0) { // Browser missed a mouseUp event
+		if(!isTouch && e.which == 0) { // Browser missed a mouseUp event
 			release();
 			return false;
 		}
@@ -170,8 +171,8 @@ function bringIntoView(viewPort, element) {
 			jumpTo(viewPort, element);
 	});
 }
-scroll(800,0);
 
 mainViewPort.find('*').focus(function(){bringIntoView(mainViewPort, this)});
+mainViewPort.find('*').on('dragstart',function(){return false});
 hBar.find('*').focus(function(){bringIntoView(hBar, this)});
 vBar.find('*').focus(function(){bringIntoView(vBar, this)});
