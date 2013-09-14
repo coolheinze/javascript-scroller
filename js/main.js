@@ -16,8 +16,8 @@ var isTouch = typeof window.ontouchstart !== 'undefined';
 
 // Variables for kinetic dynamics
 var velX = velY = 0;
-var capVel = 1; // ??
-var minVel = 0.01; // ??
+var capVel = 2;
+var minVel = 0.01;
 var damping = 0.05;
 
 var PRESSED = 1, ROLLING = 2, OFF = 0;
@@ -46,19 +46,27 @@ if ( !window.requestAnimationFrame ) {
 	}());
 }
 
-if (isTouch) {
+//if (isTouch) {
     mainViewPort.on('touchstart', tap);
     hBar.on('touchstart', tap);
     vBar.on('touchstart', tap);
     $(document).on('touchmove', drag);
     $(document).on('touchend', release);
-}
+//}
 mainViewPort.on('mousedown', tap);
 hBar.on('mousedown', tap);
 vBar.on('mousedown', tap);
 $(document).on('mousemove', drag);
 $(document).on('mouseup', release);
 
+// Prevent browser's default dragging of links
+mainViewPort.find('*').on('dragstart',function(){return false});
+hBar.find('*').on('dragstart',function(){return false});
+vBar.find('*').on('dragstart',function(){return false});
+
+mainViewPort.find('*').focus(function(){bringIntoView(mainViewPort, this)});
+hBar.find('*').focus(function(){bringIntoView(hBar, this)});
+vBar.find('*').focus(function(){bringIntoView(vBar, this)});
 
 function posX(e) {
     // touch event
@@ -164,15 +172,10 @@ function bringIntoView(viewPort, element) {
 		viewPort.scrollLeft(0);
 		viewPort.scrollTop(0);
 		var position = $(element).position();
-		if(offsetX >= position.left ||
-		   offsetY >= position.top ||
-		   offsetX + viewPort.width() <= position.left + $(element).width() ||
-		   offsetY + viewPort.height() <= position.top + $(element).height())
+		if(offsetX > position.left ||
+		   offsetY > position.top ||
+		   offsetX + viewPort.width() < position.left + $(element).width() ||
+		   offsetY + viewPort.height() < position.top + $(element).height())
 			jumpTo(viewPort, element);
 	});
 }
-
-mainViewPort.find('*').focus(function(){bringIntoView(mainViewPort, this)});
-mainViewPort.find('*').on('dragstart',function(){return false});
-hBar.find('*').focus(function(){bringIntoView(hBar, this)});
-vBar.find('*').focus(function(){bringIntoView(vBar, this)});
