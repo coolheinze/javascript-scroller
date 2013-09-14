@@ -12,6 +12,8 @@ var offsetX = minX = referenceX = deltaX = 0;
 var maxY = mainViewPortView.height() - mainViewPort.height();
 var offsetY = minY = referenceY = deltaY = 0;
 var referenceT = new Date().getTime();
+
+// Detect touch for fix browser
 var isTouch = typeof window.ontouchstart !== 'undefined';
 
 // Variables for kinetic dynamics
@@ -22,6 +24,7 @@ var damping = 0.05;
 
 var PRESSED = 1, ROLLING = 2, OFF = 0;
 var status = OFF;
+var didDrag = false;
 
 var xform = 'transform';
 ['webkit', 'Moz', 'O', 'ms'].every(function (prefix) {
@@ -46,28 +49,41 @@ if ( !window.requestAnimationFrame ) {
 	}());
 }
 
-//if (isTouch) {
-    mainViewPort.on('touchstart', tap);
-    hBar.on('touchstart', tap);
-    vBar.on('touchstart', tap);
-    $(document).on('touchmove', drag);
-    $(document).on('touchend', release);
-//}
+mainViewPort.on('touchstart', tap);
+hBar.on('touchstart', tap);
+vBar.on('touchstart', tap);
+$(document).on('touchmove', drag);
+$(document).on('touchend', release);
+
 mainViewPort.on('mousedown', tap);
 hBar.on('mousedown', tap);
 vBar.on('mousedown', tap);
 $(document).on('mousemove', drag);
 $(document).on('mouseup', release);
 
-// Prevent browser's default dragging of links
+// Prevent browser's default dragging of links within scroll area
 mainViewPort.find('*').on('dragstart',function(){return false});
 hBar.find('*').on('dragstart',function(){return false});
 vBar.find('*').on('dragstart',function(){return false});
 
+// Centre view on focused item not fully visible in viewport
 mainViewPort.find('*').focus(function(){bringIntoView(mainViewPort, this)});
 hBar.find('*').focus(function(){bringIntoView(hBar, this)});
 vBar.find('*').focus(function(){bringIntoView(vBar, this)});
 
+// Prevent accidental clicks from being fired when user is dragging
+mainViewPort.find('a').click(preventAccidentalClick);
+hBar.find('a').click(preventAccidentalClick);
+vBar.find('a').click(preventAccidentalClick);
+
+function preventAccidentalClick(e) {
+	if(didDrag){
+		e.preventDefault();
+		e.stopPropagation();
+		return false;
+	}
+	return true;
+}
 function posX(e) {
     // touch event
     if (e.originalEvent.targetTouches && (e.originalEvent.targetTouches.length >= 1)) return e.originalEvent.targetTouches[0].pageX;
@@ -92,33 +108,30 @@ function scroll(x, y) {
 
 function tap(e) {
     status = PRESSED;
+	requestAnimationFrame(function(){didDrag = false;}); // Due to iOS firing down, up and click at once, wait a little before clearing var
     referenceY = posY(e);
     referenceX = posX(e);
 	velX = velY = 0;
-//    e.preventDefault();
-//    e.stopPropagation();
     return true;
 }
 
 function drag(e) {
 	if (status == PRESSED) {
-		if(!isTouch && e.which == 0) { // Browser missed a mouseUp event
-			release();
-			return false;
-		}
 		var x, y;
 		x = posX(e);
 		y = posY(e);
 		deltaX = referenceX - x;
 		deltaY = referenceY - y;
 		
-		var now = new Date().getTime();
-		velX = deltaX / (now - referenceT);
-		velY = deltaY / (now - referenceT);
-		
-		referenceT = now;
-		
 		if (deltaX > 2 || deltaX < -2 || deltaY > 2 || deltaY < -2) {
+			didDrag = true;
+			
+			var now = new Date().getTime();
+			velX = deltaX / (now - referenceT);
+			velY = deltaY / (now - referenceT);
+			
+			referenceT = now;
+			
 			referenceX = x;
 			referenceY = y;
 			scroll(offsetX + deltaX, offsetY + deltaY);
@@ -171,6 +184,7 @@ function bringIntoView(viewPort, element) {
 	requestAnimationFrame(function(){
 		viewPort.scrollLeft(0);
 		viewPort.scrollTop(0);
+		if(status != OFF) return;
 		var position = $(element).position();
 		if(offsetX > position.left ||
 		   offsetY > position.top ||
