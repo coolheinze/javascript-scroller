@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<!--*
+*
+* Copyright (c) 2012 Emil Heinze
+* All rights reserved.
+*
+*-->
+<html lang="en">
+	<head>
+		<style>
+			#hBar, #mainViewPort {
+				width: 600px;
+			}
+			#vBar, #mainViewPort {
+				height: 300px;
+			}
+			#hBar {
+				position: absolute;
+				overflow: hidden;
+				top: 10px;
+				left: 10px;
+				height: 50px;
+			}
+			#vBar {
+				position: absolute;
+				overflow: hidden;
+				top: 75px;
+				left: 10px;
+				width: 50px;
+			}
+			#mainViewPort {
+				position: absolute;
+				overflow: hidden;
+				top: 75px;
+				left: 75px;
+			}
+			#hBar > div, #vBar > div, #mainViewPort > div {
+				width: 1600px;
+				height: 1200px;
+				background: url('back.jpg');
+				position: absolute;
+			}
+			a {
+				position: absolute;
+				top: 500px;
+				left: 600px;
+				width: 100px;
+				height: 100px;
+				background: red;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="hBar"><div>		<a style="top:7px; height: 20px;" href="#wuhuu"></a>
+</div></div>
+		<div id="vBar"><div></div></div>
+		<div id="mainViewPort"><div>
+		<a style="left:700px" href="#wuhuu"></a>
+		<a style="left:800px" href="#wuhuu"></a>
+		<a style="left:900px" href="#wuhuu"></a>
+		<a style="left:1000px" href="#wuhuu"></a>
+		<a style="left:1100px" href="#wuhuu"></a>
+		<a style="left:1200px" href="#wuhuu"></a>
+		</div></div>
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>
