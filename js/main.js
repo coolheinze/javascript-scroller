@@ -7,9 +7,9 @@ var vBar = $('#vBar');
 var vBarView = $('#vBar').children().first();
 
 // Variables for positioning and tracking
-var maxX = mainViewPortView.width() - mainViewPort.width();
+var maxX = Math.max(0, mainViewPortView.width() - mainViewPort.width());
 var offsetX = minX = referenceX = deltaX = 0;
-var maxY = mainViewPortView.height() - mainViewPort.height();
+var maxY = Math.max(0, mainViewPortView.height() - mainViewPort.height());
 var offsetY = minY = referenceY = deltaY = 0;
 var referenceT = new Date().getTime();
 
